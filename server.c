@@ -24,26 +24,33 @@ int main() {
 
 	while (1)
 	{
-		from_client = server_handshake(&to_client);
-		if (from_client == -1)
+		int c = server_fork(&from_client, &to_client);
+		if (from_client == -1 || to_client == -1 || c == -1)
 		{
 			return -1;
 		}
 
-		printf("New client entered\n");
-		
-		char input[BUFFER_SIZE];
-		while (read(from_client, input, BUFFER_SIZE) > 0)
-		{
-			process(input);
-			
-			if (write(to_client, input, BUFFER_SIZE) == -1)
-			{
-				printf("%s\n", strerror(errno));
-			}
-		}
+        if (c == 0)
+        {
+            printf("New client entered\n");
+            
+            char input[BUFFER_SIZE];
+            while (read(from_client, input, BUFFER_SIZE) > 0)
+            {
+                process(input);
+                
+                if (write(to_client, input, BUFFER_SIZE) == -1)
+                {
+                    printf("%s\n", strerror(errno));
+                }
+            }
 
-		printf("Client exited\n");
+            printf("Client exited\n");
+            exit(0);
+        }
+
+		close(from_client);
+		close(to_client);
 	}
 
 	return 0;

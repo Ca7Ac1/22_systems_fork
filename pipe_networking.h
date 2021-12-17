@@ -17,6 +17,7 @@
 #define BUFFER_SIZE 1000
 
 int server_handshake(int *to_client);
+int server_fork(int *from_client, int *to_client);
 int client_handshake(int *to_server);
 
 #endif
